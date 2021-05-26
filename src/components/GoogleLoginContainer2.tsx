@@ -6,12 +6,18 @@ import { Stack, Text } from "@chakra-ui/layout";
 import { Button } from "@chakra-ui/button";
 import { serviceUrl } from "../../constants/constants";
 
+interface User {
+  notion_key?: string;
+  database_id?: string;
+  id?: string;
+}
+
 interface GoogleLoginContainer2Props {}
 const GoogleLoginOAtuh: FC<GoogleLoginContainer2Props> = () => {
   const [databaseId, setDatabaseId] = useState<string>();
   const [integrationKey, setIntegrationKey] = useState<string>();
   const [label, setLabel] = useState<string>();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<{ user: User }>();
 
   const config: AxiosRequestConfig = {
     headers: {
@@ -31,7 +37,7 @@ const GoogleLoginOAtuh: FC<GoogleLoginContainer2Props> = () => {
         setUser(me.data);
       } catch (err) {
         console.log({ err });
-        setUser(null);
+        setUser(undefined);
         return null;
       }
     })();
