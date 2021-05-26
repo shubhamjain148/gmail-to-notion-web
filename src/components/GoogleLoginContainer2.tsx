@@ -44,6 +44,7 @@ const GoogleLoginOAtuh: FC<GoogleLoginContainer2Props> = () => {
   }, []);
 
   const updateUser = async () => {
+    console.log("service url is ", serviceUrl);
     try {
       axios.post(
         `${serviceUrl}/updateUser`,

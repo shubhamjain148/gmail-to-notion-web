@@ -31,6 +31,7 @@ const LoggedIn = () => {
       };
       (async () => {
         try {
+          console.log("service url is ", serviceUrl);
           await axios.post(
             `${serviceUrl}/createUser`,
             {
