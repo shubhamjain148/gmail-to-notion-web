@@ -1,1 +1,1 @@
-export const serviceUrl = "https://gmail-notion-api.herokuapp.com";
+export const serviceUrl = process.env.SERVICE_URL;

@@ -21,6 +21,10 @@ module.exports = (phase) => {
       if (isDev) return "http://localhost:3000";
       return "https://gmail-to-notion-web.vercel.app";
     })(),
+    SERVICE_URL: (() => {
+      if (isDev) return "http://localhost:5000";
+      return "https://gmail-notion-api.herokuapp.com";
+    })(),
   };
 
   // next.config.js object
