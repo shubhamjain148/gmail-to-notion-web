@@ -8,12 +8,11 @@ export const signInToGoogle = () => {
   var form = document.createElement("form");
   form.setAttribute("method", "GET"); // Send as a GET request.
   form.setAttribute("action", oauth2Endpoint);
-
   // Parameters to pass to OAuth 2.0 endpoint.
   var params: { [key: string]: string } = {
     client_id:
       "891866724637-ajjtrcs38vo42f3s5s6vqq3tmplnd9qu.apps.googleusercontent.com",
-    redirect_uri: "http://localhost:3000/loggedIn",
+    redirect_uri: `${process.env.REDIRECT_URL}/loggedIn`,
     response_type: "code",
     scope:
       "https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/gmail.settings.basic",
