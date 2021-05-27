@@ -19,7 +19,7 @@ module.exports = (phase) => {
   const env = {
     REDIRECT_URL: (() => {
       if (isDev) return "http://localhost:3000";
-      return "https://gmail-to-notion-web.vercel.app";
+      return "https://gmail-notion-web.herokuapp.com";
     })(),
     SERVICE_URL: (() => {
       if (isDev) return "http://localhost:5000";
