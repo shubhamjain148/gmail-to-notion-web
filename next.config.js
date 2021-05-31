@@ -19,7 +19,7 @@ module.exports = (phase) => {
   const env = {
     REDIRECT_URL: (() => {
       if (isDev) return "http://localhost:3000";
-      return "http://www.getitonotion.com";
+      return "https://www.getitonotion.com";
     })(),
     SERVICE_URL: (() => {
       if (isDev) return "http://localhost:5000";
