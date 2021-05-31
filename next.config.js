@@ -23,7 +23,7 @@ module.exports = (phase) => {
     })(),
     SERVICE_URL: (() => {
       if (isDev) return "http://localhost:5000";
-      return "http://api.getitonotion.com";
+      return "https://api.getitonotion.com";
     })(),
   };
 
