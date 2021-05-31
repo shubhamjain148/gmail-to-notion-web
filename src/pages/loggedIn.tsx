@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import axios, { AxiosRequestConfig } from "axios";
 import { useRouter } from "next/router";
 import { serviceUrl } from "../../constants/constants";
+import { Spinner } from "@chakra-ui/spinner";
 
 const LoggedIn = () => {
   const router = useRouter();
@@ -49,7 +50,7 @@ const LoggedIn = () => {
     }
   }, []);
 
-  return <div>Test</div>;
+  return <Spinner />;
 };
 
 export default LoggedIn;

@@ -1,14 +1,15 @@
 import React, { FC, useEffect, useState } from "react";
 import { signInToGoogle } from "../service/googleOauth2";
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { Input } from "@chakra-ui/input";
-import { Stack, Text } from "@chakra-ui/layout";
+import { Flex, Stack, Text } from "@chakra-ui/layout";
 import { Button } from "@chakra-ui/button";
 import { serviceUrl } from "../../constants/constants";
 
 interface User {
   notion_key?: string;
   database_id?: string;
+  label?: string;
   id?: string;
 }
 
@@ -16,6 +17,8 @@ interface GoogleLoginContainer2Props {}
 const GoogleLoginOAtuh: FC<GoogleLoginContainer2Props> = () => {
   const [databaseId, setDatabaseId] = useState<string>();
   const [integrationKey, setIntegrationKey] = useState<string>();
+  const [savingUser, setSavingUser] = useState<boolean>(false);
+  const [saveToNotion, setSaveToNotion] = useState<boolean>(false);
   const [label, setLabel] = useState<string>();
   const [user, setUser] = useState<{ user: User }>();
 
@@ -35,6 +38,10 @@ const GoogleLoginOAtuh: FC<GoogleLoginContainer2Props> = () => {
         const me = await axios.get(`${serviceUrl}/me`, config);
         console.log({ data: me.data });
         setUser(me.data);
+        const { database_id, notion_key, label } = me.data.user;
+        setDatabaseId(database_id);
+        setIntegrationKey(notion_key);
+        setLabel(label);
       } catch (err) {
         console.log({ err });
         setUser(undefined);
@@ -45,8 +52,9 @@ const GoogleLoginOAtuh: FC<GoogleLoginContainer2Props> = () => {
 
   const updateUser = async () => {
     console.log("service url is ", serviceUrl);
+    setSavingUser(true);
     try {
-      axios.post(
+      const updatedUser: AxiosResponse<User> = await axios.post<User>(
         `${serviceUrl}/updateUser`,
         {
           notion_key: integrationKey,
@@ -55,15 +63,21 @@ const GoogleLoginOAtuh: FC<GoogleLoginContainer2Props> = () => {
         },
         config
       );
+      const { database_id, notion_key, label: userLabel } = updatedUser.data;
+      setDatabaseId(database_id);
+      setIntegrationKey(notion_key);
+      setLabel(userLabel);
     } catch (err) {
       console.log({ err });
       return null;
     }
+    setSavingUser(false);
   };
 
   const addToNotion = async () => {
+    setSaveToNotion(true);
     try {
-      axios.post(
+      await axios.post(
         `${serviceUrl}/notion`,
         {
           notion_key: integrationKey,
@@ -76,30 +90,52 @@ const GoogleLoginOAtuh: FC<GoogleLoginContainer2Props> = () => {
       console.log({ err });
       return null;
     }
+    setSaveToNotion(false);
   };
 
   return user?.user ? (
-    <Stack spacing={4}>
-      <Text mb="4px">Database Id of Notion</Text>
-      <Input
-        value={databaseId}
-        onChange={(event) => setDatabaseId(event.target.value)}
-        placeholder="database id of notion"
-      />
-      <Text mb="4px">Notion Integration Key</Text>
-      <Input
-        value={integrationKey}
-        onChange={(event) => setIntegrationKey(event.target.value)}
-        placeholder="notion integration key"
-      />
-      <Text mb="4px">Gmail Label to use</Text>
-      <Input
-        value={label}
-        onChange={(event) => setLabel(event.target.value)}
-        placeholder="gmail label"
-      />
-      <Button onClick={updateUser}>Update user details</Button>
-      <Button onClick={addToNotion}>Post To Notion</Button>
+    <Stack pb={4} spacing={4}>
+      <Flex direction="column">
+        <Text mb="4px">Database Id of Notion</Text>
+        <Input
+          value={databaseId}
+          onChange={(event) => setDatabaseId(event.target.value)}
+          placeholder="database id of notion"
+        />
+      </Flex>
+      <Flex direction="column">
+        <Text mb="4px">Notion Integration Key</Text>
+        <Input
+          value={integrationKey}
+          onChange={(event) => setIntegrationKey(event.target.value)}
+          placeholder="notion integration key"
+        />
+      </Flex>
+
+      <Flex direction="column">
+        <Text mb="4px">Gmail Label to use</Text>
+        <Input
+          value={label}
+          onChange={(event) => setLabel(event.target.value)}
+          placeholder="gmail label"
+        />
+      </Flex>
+      <Button
+        isLoading={savingUser}
+        loadingText="Updating your details"
+        onClick={updateUser}
+      >
+        Update user details
+      </Button>
+      {user?.user?.database_id && user?.user?.notion_key && (
+        <Button
+          isLoading={saveToNotion}
+          loadingText="Getting your email into notion"
+          onClick={addToNotion}
+        >
+          Post To Notion
+        </Button>
+      )}
     </Stack>
   ) : (
     <>
