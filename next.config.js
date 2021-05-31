@@ -19,11 +19,11 @@ module.exports = (phase) => {
   const env = {
     REDIRECT_URL: (() => {
       if (isDev) return "http://localhost:3000";
-      return "https://gmail-notion-web.herokuapp.com";
+      return "http://www.getitonotion.com";
     })(),
     SERVICE_URL: (() => {
       if (isDev) return "http://localhost:5000";
-      return "https://gmail-notion-api.herokuapp.com";
+      return "http://api.getitonotion.com";
     })(),
   };
 
