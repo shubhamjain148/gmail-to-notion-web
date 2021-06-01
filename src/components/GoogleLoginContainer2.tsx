@@ -1,10 +1,12 @@
 import React, { FC, useEffect, useState } from "react";
 import { signInToGoogle } from "../service/googleOauth2";
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import { Input } from "@chakra-ui/input";
 import { Flex, Stack, Text } from "@chakra-ui/layout";
 import { Button } from "@chakra-ui/button";
 import { serviceUrl } from "../../constants/constants";
+import { axiosConfig } from "../service/gmailNotion";
+import NotionDatabaseRender from "./DatabaseRender";
 
 interface User {
   notion_key?: string;
@@ -20,28 +22,20 @@ const GoogleLoginOAtuh: FC<GoogleLoginContainer2Props> = () => {
   const [savingUser, setSavingUser] = useState<boolean>(false);
   const [saveToNotion, setSaveToNotion] = useState<boolean>(false);
   const [label, setLabel] = useState<string>();
-  const [user, setUser] = useState<{ user: User }>();
-
-  const config: AxiosRequestConfig = {
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Credentials": true,
-      credentials: "include",
-    },
-    withCredentials: true,
-  };
+  const [user, setUser] = useState<User>();
 
   useEffect(() => {
     (async () => {
       try {
-        const me = await axios.get(`${serviceUrl}/me`, config);
+        const me = await axios.get(`${serviceUrl}/me`, axiosConfig);
         console.log({ data: me.data });
-        setUser(me.data);
-        const { database_id, notion_key, label } = me.data.user;
-        setDatabaseId(database_id);
-        setIntegrationKey(notion_key);
-        setLabel(label);
+        setUser(me.data.user);
+        if (me.data.user) {
+          const { database_id, notion_key, label } = me.data.user;
+          setDatabaseId(database_id);
+          setIntegrationKey(notion_key);
+          setLabel(label);
+        }
       } catch (err) {
         console.log({ err });
         setUser(undefined);
@@ -61,9 +55,10 @@ const GoogleLoginOAtuh: FC<GoogleLoginContainer2Props> = () => {
           database_id: databaseId,
           label,
         },
-        config
+        axiosConfig
       );
       const { database_id, notion_key, label: userLabel } = updatedUser.data;
+      setUser(updatedUser.data);
       setDatabaseId(database_id);
       setIntegrationKey(notion_key);
       setLabel(userLabel);
@@ -74,26 +69,7 @@ const GoogleLoginOAtuh: FC<GoogleLoginContainer2Props> = () => {
     setSavingUser(false);
   };
 
-  const addToNotion = async () => {
-    setSaveToNotion(true);
-    try {
-      await axios.post(
-        `${serviceUrl}/notion`,
-        {
-          notion_key: integrationKey,
-          database_id: databaseId,
-          label,
-        },
-        config
-      );
-    } catch (err) {
-      console.log({ err });
-      return null;
-    }
-    setSaveToNotion(false);
-  };
-
-  return user?.user ? (
+  return user ? (
     <Stack pb={4} spacing={4}>
       <Flex direction="column">
         <Text mb="4px">Database Id of Notion</Text>
@@ -127,14 +103,14 @@ const GoogleLoginOAtuh: FC<GoogleLoginContainer2Props> = () => {
       >
         Update user details
       </Button>
-      {user?.user?.database_id && user?.user?.notion_key && (
-        <Button
-          isLoading={saveToNotion}
-          loadingText="Getting your email into notion"
-          onClick={addToNotion}
-        >
-          Post To Notion
-        </Button>
+      {user?.database_id && user?.label && user?.notion_key && (
+        <>
+          <NotionDatabaseRender
+            integrationKey={user.notion_key}
+            label={user.label}
+            databaseId={user.database_id}
+          />
+        </>
       )}
     </Stack>
   ) : (
