@@ -20,7 +20,6 @@ const GoogleLoginOAtuh: FC<GoogleLoginContainer2Props> = () => {
   const [databaseId, setDatabaseId] = useState<string>();
   const [integrationKey, setIntegrationKey] = useState<string>();
   const [savingUser, setSavingUser] = useState<boolean>(false);
-  const [saveToNotion, setSaveToNotion] = useState<boolean>(false);
   const [label, setLabel] = useState<string>();
   const [user, setUser] = useState<User>();
 
